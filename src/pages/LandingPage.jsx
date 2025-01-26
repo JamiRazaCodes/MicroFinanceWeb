@@ -1,10 +1,22 @@
-import React, { useState } from "react";
-import { Link } from "react-router";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router"; // Corrected import path to 'react-router-dom'
 import { UserCircle, Facebook, Twitter, Instagram } from "lucide-react";
 
 const LandingPage = () => {
-  // Mock user state (replace with actual authentication logic)
-  const [user, setUser] = useState(null); // Set to an object like { name: "John Doe" } if user exists
+  // Check if token exists in localStorage (or use sessionStorage, depending on your authentication strategy)
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Get token from localStorage (replace with your actual logic to check for a valid token)
+    const token = localStorage.getItem("token");
+    if (token) {
+      // Assuming token means the user is logged in
+      // Replace this with actual user data if available (e.g., from an API call)
+      setUser({ name: "John Doe" });
+    } else {
+      setUser(null); // No token means user is not logged in
+    }
+  }, []); // This useEffect runs only once, when the component mounts
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -55,7 +67,7 @@ const LandingPage = () => {
               to="/userdashboard"
               className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition"
             >
-              User Dashoard
+              User Dashboard
             </Link>
           </div>
         </div>

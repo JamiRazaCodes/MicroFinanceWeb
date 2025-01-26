@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -9,11 +10,14 @@ const Register = () => {
     confirmPassword: '',
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Automatically generate password based on the first 4 letters of the name
@@ -25,8 +29,31 @@ const Register = () => {
       confirmPassword: generatedPassword, // Ensure confirmPassword matches
     });
 
-    // Add your registration logic here
-    console.log('Form Submitted', formData);
+    // Set loading state to true
+    setIsSubmitting(true);
+    setError(null); // Clear any previous errors
+
+    try {
+      // Example POST request to register user
+      const response = await axios.post('http://localhost:8000/api/auth/signup', {
+        name: formData.name,
+        email: formData.email,
+        cnic: formData.cnic,
+        password: formData.password,
+      })
+
+      // Handle successful registration (e.g., redirect or show success message)
+      console.log('Registration successful', response.data);
+      // Redirect to login page after successful registration (optional)
+      window.location.href = '/login';
+    } catch (err) {
+      // Handle error
+      setError('There was an issue registering your account. Please try again.');
+      console.error(err);
+    } finally {
+      // Reset loading state
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -93,7 +120,7 @@ const Register = () => {
             <input
               id="password"
               name="password"
-              type="string"
+              type="text"
               value={formData.password}
               readOnly
               placeholder="Password will be generated"
@@ -109,7 +136,7 @@ const Register = () => {
             <input
               id="confirmPassword"
               name="confirmPassword"
-              type="string"
+              type="text"
               value={formData.confirmPassword}
               readOnly
               placeholder="Password will be generated"
@@ -117,12 +144,20 @@ const Register = () => {
             />
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="text-red-600 text-center mt-2">
+              <p>{error}</p>
+            </div>
+          )}
+
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-green-600 text-white font-medium py-2 rounded-lg hover:bg-green-700 transition-colors"
+            disabled={isSubmitting}
+            className={`w-full bg-green-600 text-white font-medium py-2 rounded-lg hover:bg-green-700 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            Register
+            {isSubmitting ? 'Submitting...' : 'Register'}
           </button>
         </form>
 
